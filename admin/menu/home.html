@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .welcome-section {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .member-info {
+        color: #888;
+        font-size: 0.9rem;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        height: 300px;
+      }
+
+      .chart-title {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        color: var(--text-color);
+      }
+
+      .apps-list {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-top: 2rem;
+      }
+
+      .app-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: background-color 0.3s;
+      }
+
+      .app-item:last-child {
+        border-bottom: none;
+      }
+
+      .app-item:hover {
+        background-color: var(--hover-color);
+      }
+
+      .app-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        margin-right: 1rem;
+      }
+
+      .app-info {
+        flex-grow: 1;
+      }
+
+      .app-name {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .app-date {
+        color: #888;
+        font-size: 0.8rem;
+      }
+
+      .no-apps {
+        text-align: center;
+        padding: 3rem;
+        color: #888;
+      }
+
+      .add-first-app {
+        display: inline-block;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        margin-top: 1rem;
+        transition: background-color 0.3s;
+      }
+
+      .add-first-app:hover {
+        background-color: var(--secondary-color);
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <h1>Welcome back! 👋</h1>
+      <p class="member-info">Member since: <span id="memberSince"></span></p>
+      <p>Total Apps: <span id="totalApps">0</span></p>
+    </div>
+
+    <!-- Analytics Section -->
+    <div class="stats-grid">
+      <!-- Monthly Analytics -->
+      <div class="stat-card">
+        <h3 class="chart-title">Monthly Analytics</h3>
+        <canvas id="monthlyChart"></canvas>
+      </div>
+
+      <!-- Most Visited Apps -->
+      <div class="stat-card">
+        <h3 class="chart-title">Most Visited Apps</h3>
+        <canvas id="visitedChart"></canvas>
+      </div>
+
+      <!-- Daily Analytics -->
+      <div class="stat-card">
+        <h3 class="chart-title">Daily Analytics</h3>
+        <canvas id="dailyChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Apps List -->
+    <div class="apps-list">
+      <h3>Your Apps</h3>
+      <div id="appsList">
+        <!-- Apps will be loaded here -->
+      </div>
+    </div>
+
+    <script>
+      // Initialize page
+      async function initHome() {
+        setMemberSince();
+        await loadApps();
+        initCharts();
+      }
+
+      // Set member since date
+      function setMemberSince() {
+        const memberDate =
+          localStorage.getItem("memberSince") || new Date().toISOString();
+        if (!localStorage.getItem("memberSince")) {
+          localStorage.setItem("memberSince", memberDate);
+        }
+        const date = new Date(memberDate);
+        document.getElementById("memberSince").textContent =
+          date.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+      }
+
+      // Load apps from Supabase
+      async function loadApps() {
+        try {
+          const { data, error } = await supabase
+            .from("apps")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+          if (error) throw error;
+
+          const appsContainer = document.getElementById("appsList");
+          document.getElementById("totalApps").textContent = data.length;
+
+          if (data.length === 0) {
+            appsContainer.innerHTML = `
+                        <div class="no-apps">
+                            <p>Kamu belum tambahin apps apapun</p>
+                            <a href="#" class="add-first-app">
+                                <i class="fas fa-plus me-2"></i>Tambahkan apps pertamamu
+                            </a>
+                        </div>`;
+            return;
+          }
+
+          appsContainer.innerHTML = data
+            .map(
+              (app) => `
+                    <div class="app-item">
+                        <img src="${JSON.parse(app.thumbnails)[0]}" alt="${
+                app.name
+              }" class="app-icon">
+                        <div class="app-info">
+                            <h4 class="app-name">${app.name}</h4>
+                            <span class="app-date">Added on ${new Date(
+                              app.created_at
+                            ).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                `
+            )
+            .join("");
+        } catch (error) {
+          console.error("Error loading apps:", error);
+        }
+      }
+
+      // Initialize charts
+      function initCharts() {
+        // Monthly Analytics Chart
+        new Chart(document.getElementById("monthlyChart"), {
+          type: "line",
+          data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [
+              {
+                label: "Monthly Views",
+                data: [650, 590, 800, 810, 960, 890],
+                borderColor: "#3e5bff",
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          },
+        });
+
+        // Most Visited Apps Chart
+        new Chart(document.getElementById("visitedChart"), {
+          type: "doughnut",
+          data: {
+            labels: ["App 1", "App 2", "App 3", "Others"],
+            datasets: [
+              {
+                data: [40, 30, 20, 10],
+                backgroundColor: ["#3cd682", "#2da0ff", "#0734ff", "#f4b836"],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          },
+        });
+
+        // Daily Analytics Chart
+        new Chart(document.getElementById("dailyChart"), {
+          type: "bar",
+          data: {
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+            datasets: [
+              {
+                label: "Daily Views",
+                data: [65, 59, 80, 81, 56, 40, 30],
+                backgroundColor: "#3e5bff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

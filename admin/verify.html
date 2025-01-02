@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlexP Admin - Verify</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #3e5bff;
+        --secondary-color: #1d3be6;
+        --background-color: #343541;
+        --card-bg: #444654;
+        --text-color: #ffffff;
+        --border-color: #565869;
+        --hover-color: #2a2b32;
+        --shadow-color: rgba(0, 0, 0, 0.2);
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .verify-container {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px var(--shadow-color);
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1.5rem;
+      }
+
+      .verify-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+      }
+
+      .password-input {
+        background-color: var(--background-color);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        width: 100%;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .password-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(62, 91, 255, 0.2);
+      }
+
+      .verify-btn {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+      }
+
+      .verify-btn:hover {
+        background-color: var(--secondary-color);
+      }
+
+      .error-message {
+        color: #ff4d4d;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      .attempts-left {
+        color: #888;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+      }
+
+      /* Loading Animation */
+      .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(52, 53, 65, 0.9);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .loader {
+        width: 48px;
+        height: 48px;
+        border: 5px solid var(--primary-color);
+        border-bottom-color: transparent;
+        border-radius: 50%;
+        animation: rotation 1s linear infinite;
+      }
+
+      .success-checkmark {
+        display: none;
+        color: #3cd682;
+        font-size: 48px;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .denied-message {
+        display: none;
+        color: #ff4d4d;
+        margin-top: 1rem;
+        padding: 1rem;
+        border: 1px solid #ff4d4d;
+        border-radius: 8px;
+        background-color: rgba(255, 77, 77, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="verify-container">
+      <img
+        src="https://forum.obsidian.md/uploads/default/original/2X/6/6df43bc4ee96f0a1b67ff3600caf6879b758a743.png"
+        alt="Logo"
+        class="logo"
+      />
+      <h1 class="verify-title">FlexConsole Verification</h1>
+      <input
+        type="password"
+        class="password-input"
+        placeholder="Enter password"
+        id="passwordInput"
+      />
+      <button class="verify-btn" onclick="verifyPassword()">Verify</button>
+      <div class="error-message" id="errorMessage"></div>
+      <div class="attempts-left" id="attemptsLeft"></div>
+      <div class="denied-message" id="deniedMessage">
+        Access denied for 7 days due to too many failed attempts.
+      </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loader"></div>
+      <div class="success-checkmark">✓</div>
+    </div>
+
+    <script>
+      // Check if user is already verified
+      if (localStorage.getItem("isVerified") === "true") {
+        window.location.href = "admin.html";
+      }
+
+      // Check if user is banned
+      const banUntil = localStorage.getItem("banUntil");
+      if (banUntil && new Date().getTime() < parseInt(banUntil)) {
+        document.getElementById("passwordInput").disabled = true;
+        document.getElementById("deniedMessage").style.display = "block";
+        document.querySelector(".verify-btn").disabled = true;
+      }
+
+      const correctPassword = "XAPP1210"; // In real application, this should be securely stored
+      let attempts = parseInt(localStorage.getItem("attempts") || "0");
+      const maxAttempts = 5;
+
+      updateAttemptsDisplay();
+
+      function updateAttemptsDisplay() {
+        const remaining = maxAttempts - attempts;
+        document.getElementById(
+          "attemptsLeft"
+        ).textContent = `${remaining} attempts remaining`;
+      }
+
+      function verifyPassword() {
+        const password = document.getElementById("passwordInput").value;
+        const errorMessage = document.getElementById("errorMessage");
+
+        if (password === correctPassword) {
+          // Show loading animation
+          const loadingOverlay = document.getElementById("loadingOverlay");
+          const loader = loadingOverlay.querySelector(".loader");
+          const checkmark = loadingOverlay.querySelector(".success-checkmark");
+
+          loadingOverlay.style.display = "flex";
+
+          // After 3 seconds, show checkmark
+          setTimeout(() => {
+            loader.style.display = "none";
+            checkmark.style.display = "block";
+
+            // After 1 more second, redirect
+            setTimeout(() => {
+              localStorage.setItem("isVerified", "true");
+              localStorage.removeItem("attempts");
+              window.location.href = "admin.html";
+            }, 1000);
+          }, 3000);
+        } else {
+          attempts++;
+          localStorage.setItem("attempts", attempts);
+
+          if (attempts >= maxAttempts) {
+            // Ban user for 7 days
+            const banUntil = new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
+            localStorage.setItem("banUntil", banUntil);
+
+            document.getElementById("passwordInput").disabled = true;
+            document.getElementById("deniedMessage").style.display = "block";
+            document.querySelector(".verify-btn").disabled = true;
+          } else {
+            errorMessage.style.display = "block";
+            errorMessage.textContent = "Incorrect password";
+            updateAttemptsDisplay();
+          }
+        }
+      }
+
+      // Allow Enter key to trigger verification
+      document
+        .getElementById("passwordInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            verifyPassword();
+          }
+        });
+    </script>
+  </body>
+</html>
