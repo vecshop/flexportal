@@ -172,31 +172,40 @@
 
     <!-- Modals -->
     <!-- Help Modal -->
-    <div class="modal fade" id="helpModal" tabindex="-1">
-      <div class="modal-dialog">
+    <div
+      class="modal fade"
+      id="helpModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="helpModalLabel"
+    >
+      <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">How to Use Flexportal</h5>
+            <h5 class="modal-title" id="helpModalLabel">
+              How to Use Flexportal
+            </h5>
             <button
               type="button"
               class="btn-close"
               data-bs-dismiss="modal"
+              aria-label="Close"
             ></button>
           </div>
           <div class="modal-body">
             <div class="guide-steps">
               <div class="guide-step">
-                <i class="fas fa-search"></i>
+                <i class="fas fa-search" aria-hidden="true"></i>
                 <h6>Search or Browse</h6>
                 <p>Use the search bar or browse categories to find apps</p>
               </div>
               <div class="guide-step">
-                <i class="fas fa-star"></i>
+                <i class="fas fa-star" aria-hidden="true"></i>
                 <h6>Save Favorites</h6>
                 <p>Click the three dots menu and select "Add to favorites"</p>
               </div>
               <div class="guide-step">
-                <i class="fas fa-external-link-alt"></i>
+                <i class="fas fa-external-link-alt" aria-hidden="true"></i>
                 <h6>Launch Apps</h6>
                 <p>
                   Click on any app card or use the play button to open the app
@@ -209,15 +218,22 @@
     </div>
 
     <!-- Feedback Modal -->
-    <div class="modal fade" id="feedbackModal" tabindex="-1">
-      <div class="modal-dialog">
+    <div
+      class="modal fade"
+      id="feedbackModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="feedbackModalLabel"
+    >
+      <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Send Feedback</h5>
+            <h5 class="modal-title" id="feedbackModalLabel">Send Feedback</h5>
             <button
               type="button"
               class="btn-close"
               data-bs-dismiss="modal"
+              aria-label="Close"
             ></button>
           </div>
           <div class="modal-body">
@@ -395,8 +411,22 @@
       });
 
       // Modals
-      document.getElementById("helpBtn").addEventListener("click", () => {
-        new bootstrap.Modal(document.getElementById("helpModal")).show();
+      document.getElementById("helpBtn").addEventListener("click", function () {
+        const helpModal = new bootstrap.Modal(
+          document.getElementById("helpModal"),
+          {
+            keyboard: true,
+            focus: true,
+          }
+        );
+
+        // Ensure proper focus management
+        const helpModalElement = document.getElementById("helpModal");
+        helpModalElement.addEventListener("shown.bs.modal", function () {
+          helpModalElement.querySelector(".btn-close").focus();
+        });
+
+        helpModal.show();
       });
 
       document.getElementById("feedbackBtn").addEventListener("click", () => {
@@ -536,6 +566,29 @@
 
         return card;
       }
+
+      ["helpModal", "feedbackModal"].forEach((modalId) => {
+        const modal = document.getElementById(modalId);
+
+        // Remove aria-hidden when modal is shown
+        modal.addEventListener("show.bs.modal", function () {
+          this.removeAttribute("aria-hidden");
+        });
+
+        // Properly handle focus when modal is hidden
+        modal.addEventListener("hidden.bs.modal", function () {
+          const activeElement = document.activeElement;
+          if (activeElement) {
+            activeElement.blur();
+          }
+
+          // Remove modal backdrop
+          const backdrop = document.querySelector(".modal-backdrop");
+          if (backdrop) {
+            backdrop.remove();
+          }
+        });
+      });
 
       function formatPricing(pricing) {
         return pricing
