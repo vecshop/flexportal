@@ -472,58 +472,50 @@
       }
 
       function createAppCard(app) {
-        const card = document.createElement("div");
-        card.className = "app-card";
+    const card = document.createElement("div");
+    card.className = "app-card";
 
-        const thumbnailsHtml = app.thumbnails
-          .map(
-            (url, index) => `
-            <div class="thumbnail ${
-              index === 0 ? "active" : ""
-            }" style="background-image: url('${url}')"></div>
-        `
-          )
-          .join("");
+    const thumbnailsHtml = app.thumbnails
+        .map((url, index) => `
+            <div class="thumbnail ${index === 0 ? "active" : ""}" 
+                 style="background-image: url('${url}')">
+            </div>
+        `).join("");
 
-        card.innerHTML = `
+    card.innerHTML = `
         <div class="thumbnails-container">
             ${thumbnailsHtml}
         </div>
         <div class="card-content">
-            <h3>${app.name}</h3>
-            <p>${app.description}</p>
+            <h3 class="text-truncate">${app.name}</h3>
+            <p class="text-truncate">${app.description}</p>
             <div class="card-footer">
-                <span class="pricing-label ${app.pricing}">${formatPricing(
-          app.pricing
-        )}</span>
+                <span class="pricing-label ${app.pricing}">
+                    ${formatPricing(app.pricing)}
+                </span>
                 <div class="dropdown">
-                    <button class="btn btn-icon" data-bs-toggle="dropdown">
+                    <button class="btn btn-icon btn-sm" data-bs-toggle="dropdown">
                         <i class="fas fa-ellipsis-v"></i>
                     </button>
-                    <ul class="dropdown-menu">
+                    <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="${
-                              app.link
-                            }" target="_blank">
-                                <i class="fas fa-play"></i> Play
+                            <a class="dropdown-item" href="${app.link}" target="_blank">
+                                <i class="fas fa-play"></i>
+                                <span>Play</span>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item preview-btn" href="#" data-thumbnails='${JSON.stringify(
-                              app.thumbnails
-                            )}'>
-                                <i class="fas fa-eye"></i> Preview
+                            <a class="dropdown-item preview-btn" href="#" 
+                               data-thumbnails='${JSON.stringify(app.thumbnails)}'>
+                                <i class="fas fa-eye"></i>
+                                <span>Preview</span>
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item ${
-                              isInFavorites(app.id) ? "active" : ""
-                            }" href="#" data-app='${JSON.stringify(app)}'>
-                                <i class="fas fa-star"></i> ${
-                                  isInFavorites(app.id)
-                                    ? "Remove from"
-                                    : "Add to"
-                                } Favorites
+                            <a class="dropdown-item ${isInFavorites(app.id) ? "active" : ""}" 
+                               href="#" data-app='${JSON.stringify(app)}'>
+                                <i class="fas fa-star"></i>
+                                <span>${isInFavorites(app.id) ? "Remove from" : "Add to"} Favorites</span>
                             </a>
                         </li>
                     </ul>
