@@ -274,11 +274,38 @@
       import { initSupabase } from "./js/supabase-config.js";
 
       // Initialize Supabase and load apps
-  const { supabase, loadApps } = initSupabase();
+  const supabase = initSupabase();
+
+      // Add this after Supabase initialization
+  async function loadApps() {
+    try {
+      console.log("Attempting to load apps...");
+      const { data, error } = await supabase.from("apps").select("*");
+
+      if (error) {
+        console.error("Error loading apps:", error);
+        return;
+      }
+
+      console.log("Apps loaded:", data);
+
+      if (data && data.length > 0) {
+        apps = data;
+        filterApps();
+      } else {
+        console.log("No apps found in database");
+        showNoAppsMessage();
+      }
+    } catch (error) {
+      console.error("Failed to load apps:", error);
+      showErrorMessage("Failed to load apps");
+    }
+  }
 
   // Ensure apps are loaded after DOM is ready
   document.addEventListener("DOMContentLoaded", async () => {
-    await loadApps(); // Call loadApps after Supabase is initialized
+    const apps = await loadApps(); // Call loadApps after Supabase is initialized
+    console.log(apps);
     updateFavoritesList(); // Ensure favorites are updated
     checkFirstVisit(); // Check if it's the user's first visit
   });
