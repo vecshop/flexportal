@@ -437,48 +437,44 @@
         .getElementById("feedbackForm")
         .addEventListener("submit", handleFeedbackSubmit);
 
-      document.addEventListener("DOMContentLoaded", function () {
-        // Handler untuk setiap dropdown toggle button
-        document
-          .querySelectorAll(".app-card .dropdown .btn-icon")
-          .forEach((button) => {
-            button.addEventListener("click", function (e) {
-              e.stopPropagation();
-
-              const dropdownMenu = this.nextElementSibling;
-              if (!dropdownMenu) return;
-
-              // Dapatkan posisi button
-              const rect = this.getBoundingClientRect();
-
-              // Set posisi dropdown relative to viewport
-              dropdownMenu.style.top = `${rect.bottom + window.scrollY}px`;
-              dropdownMenu.style.right = "1rem";
-
-              // Toggle dropdown
-              if (dropdownMenu.classList.contains("show")) {
-                dropdownMenu.classList.remove("show");
-              } else {
-                // Tutup dropdown lain yang mungkin terbuka
-                document
-                  .querySelectorAll(".dropdown-menu.show")
-                  .forEach((menu) => {
-                    menu.classList.remove("show");
-                  });
-                dropdownMenu.classList.add("show");
-              }
-            });
-          });
-
-        // Tutup dropdown saat klik di luar
-        document.addEventListener("click", function (e) {
-          if (!e.target.closest(".dropdown")) {
-            document.querySelectorAll(".dropdown-menu.show").forEach((menu) => {
-              menu.classList.remove("show");
-            });
-          }
+      document.addEventListener('DOMContentLoaded', function() {
+  // Handler untuk setiap dropdown toggle button
+  document.querySelectorAll('.app-card .dropdown .btn-icon').forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation();
+      
+      const dropdownMenu = this.nextElementSibling;
+      if (!dropdownMenu) return;
+      
+      // Dapatkan posisi button
+      const rect = this.getBoundingClientRect();
+      
+      // Set posisi dropdown relative to viewport
+      dropdownMenu.style.top = `${rect.bottom + window.scrollY}px`;
+      dropdownMenu.style.right = '1rem';
+      
+      // Toggle dropdown
+      if (dropdownMenu.classList.contains('show')) {
+        dropdownMenu.classList.remove('show');
+      } else {
+        // Tutup dropdown lain yang mungkin terbuka
+        document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+          menu.classList.remove('show');
         });
+        dropdownMenu.classList.add('show');
+      }
+    });
+  });
+
+  // Tutup dropdown saat klik di luar
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+        menu.classList.remove('show');
       });
+    }
+  });
+});
 
       function filterApps() {
         let filteredApps = [...apps];
@@ -515,63 +511,56 @@
       }
 
       function createAppCard(app) {
-        const card = document.createElement("div");
-        card.className = "app-card";
+    const card = document.createElement("div");
+    card.className = "app-card";
 
-        const thumbnailsHtml = app.thumbnails
-          .map(
-            (url, index) => `
+    const thumbnailsHtml = app.thumbnails
+        .map((url, index) => `
             <div class="thumbnail ${index === 0 ? "active" : ""}" 
                  style="background-image: url('${url}')">
             </div>
-        `
-          )
-          .join("");
+        `).join("");
 
-        card.innerHTML = `
+    card.innerHTML = `
         <div class="thumbnails-container">
             ${thumbnailsHtml}
         </div>
         <div class="card-content">
-      <h3 class="text-truncate">${app.name}</h3>
-      <p class="text-truncate">${app.description}</p>
-      <div class="card-footer">
-        <span class="pricing-label ${app.pricing}">${formatPricing(
-          app.pricing
-        )}</span>
-        <div class="dropdown">
-          <button class="btn btn-icon btn-sm" type="button">
-            <i class="fas fa-ellipsis-v"></i>
-          </button>
-          <ul class="dropdown-menu">
-            <li>
-              <a class="dropdown-item" href="${app.link}" target="_blank">
-                <i class="fas fa-play"></i>
-                <span>Play</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item preview-btn" href="#" data-thumbnails='${JSON.stringify(
-                app.thumbnails
-              )}'>
-                <i class="fas fa-eye"></i>
-                <span>Preview</span>
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item ${
-                isInFavorites(app.id) ? "active" : ""
-              }" href="#" data-app='${JSON.stringify(app)}'>
-                <i class="fas fa-star"></i>
-                <span>${
-                  isInFavorites(app.id) ? "Remove from" : "Add to"
-                } Favorites</span>
-              </a>
-            </li>
-          </ul>
+            <h3 class="text-truncate">${app.name}</h3>
+            <p class="text-truncate">${app.description}</p>
+            <div class="card-footer">
+                <span class="pricing-label ${app.pricing}">
+                    ${formatPricing(app.pricing)}
+                </span>
+                <div class="dropdown">
+                    <button class="btn btn-icon btn-sm" data-bs-toggle="dropdown">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="${app.link}" target="_blank">
+                                <i class="fas fa-play"></i>
+                                <span>Play</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item preview-btn" href="#" 
+                               data-thumbnails='${JSON.stringify(app.thumbnails)}'>
+                                <i class="fas fa-eye"></i>
+                                <span>Preview</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item ${isInFavorites(app.id) ? "active" : ""}" 
+                               href="#" data-app='${JSON.stringify(app)}'>
+                                <i class="fas fa-star"></i>
+                                <span>${isInFavorites(app.id) ? "Remove from" : "Add to"} Favorites</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
     `;
 
         // Event listener untuk keseluruhan card
