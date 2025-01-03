@@ -13,13 +13,7 @@ function initSupabase() {
     console.error("Missing Supabase environment variables");
     throw new Error("Missing Supabase environment variables");
   }
-
-  // Initialize the Supabase client
-  const supabase = createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
+  
   // Check Supabase connection
   async function testConnection() {
     try {
@@ -132,6 +126,7 @@ function initSupabase() {
     },
   };
 
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   return supabase;
 }
 
