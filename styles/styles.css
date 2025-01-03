@@ -500,7 +500,6 @@ body {
   }
 
   .app-card {
-    min-width: unset !important;
     max-width: 100% !important;
   }
 
@@ -515,6 +514,21 @@ body {
   .app-card .pricing-label {
     font-size: 0.7rem !important;
     padding: 0.2rem 0.5rem !important;
+  }
+
+  .app-card .dropdown-menu {
+    min-width: 100px !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .app-card .dropdown-item {
+    padding: 0.2rem 0.5rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .app-card .dropdown-item i {
+    font-size: 0.8rem !important;
+    width: 10px !important;
   }
 }
 
