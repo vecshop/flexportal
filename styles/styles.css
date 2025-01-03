@@ -517,7 +517,7 @@ body {
   }
 
   .app-card .dropdown-menu {
-    min-width: 100px !important;
+    min-width: 90px !important;
     font-size: 0.8rem !important;
   }
   
