@@ -1,10 +1,9 @@
 // supabase-config.js
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 // supabase-config.js
 
 // Define the initialization function and export it
 function initSupabase() {
-
   // Get environment variables
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
   const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -13,7 +12,10 @@ function initSupabase() {
     console.error("Missing Supabase environment variables");
     throw new Error("Missing Supabase environment variables");
   }
-  
+
+  // Initialize the Supabase client
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   // Check Supabase connection
   async function testConnection() {
     try {
@@ -126,7 +128,6 @@ function initSupabase() {
     },
   };
 
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   return supabase;
 }
 
