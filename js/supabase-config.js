@@ -1,10 +1,9 @@
 // supabase-config.js
-
+import { createClient } from '@supabase/supabase-js';
 // supabase-config.js
 
 // Define the initialization function and export it
 function initSupabase() {
-  import { createClient } from '@supabase/supabase-js';
 
   // Get environment variables
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
