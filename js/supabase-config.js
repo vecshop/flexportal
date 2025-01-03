@@ -38,32 +38,6 @@ function initSupabase() {
     console.error("Initial connection test failed:", error);
   });
 
-  // Add this after Supabase initialization
-  async function loadApps() {
-    try {
-      console.log("Attempting to load apps...");
-      const { data, error } = await supabase.from("apps").select("*");
-
-      if (error) {
-        console.error("Error loading apps:", error);
-        return;
-      }
-
-      console.log("Apps loaded:", data);
-
-      if (data && data.length > 0) {
-        apps = data;
-        filterApps();
-      } else {
-        console.log("No apps found in database");
-        showNoAppsMessage();
-      }
-    } catch (error) {
-      console.error("Failed to load apps:", error);
-      showErrorMessage("Failed to load apps");
-    }
-  }
-
   function showNoAppsMessage() {
     const noAppsFound = document.querySelector(".no-apps-found");
     noAppsFound.classList.remove("hidden");
@@ -158,7 +132,7 @@ function initSupabase() {
     },
   };
 
-  return {supabase, loadApps};
+  return supabase;
 }
 
 export { initSupabase };
