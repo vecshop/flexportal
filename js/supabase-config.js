@@ -20,6 +20,17 @@ function initSupabase() {
     SUPABASE_ANON_KEY
   );
 
+  supabase.queries = {
+    getAllApps: async function() {
+      const { data, error } = await supabase
+        .from('apps')
+        .select('*')
+        .order('created_at', { ascending: false })
+      
+      if (error) throw error
+      return data
+    },
+
   // Check Supabase connection
   async function testConnection() {
     try {
