@@ -474,6 +474,40 @@ body {
   display: none !important;
 }
 
+.app-card {
+  position: static; /* Tidak membatasi posisi dropdown */
+}
+
+.app-card .dropdown {
+  position: static !important; /* Membebaskan dropdown dari constraint */
+}
+
+.app-card .dropdown-menu {
+  position: absolute !important; /* Menggunakan fixed positioning */
+  min-width: 120px;
+  z-index: 1050 !important; /* Memastikan dropdown muncul di atas konten lain */
+}
+
+/* Tambahkan CSS untuk mengatur posisi dropdown */
+@media (max-width: 768px) {
+  .app-card .dropdown-menu {
+    max-width: 200px !important;
+    right: 1rem !important;
+    left: auto !important;
+    transform-origin: top right !important;
+    margin-top: 0 !important;
+  }
+
+  /* Styling untuk dropdown items tetap sama */
+  .app-card .dropdown-item {
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.875rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 800px) {
   .navbar-collapse {
@@ -517,15 +551,14 @@ body {
   }
 
   .app-card .dropdown-menu {
-    min-width: 90px !important;
     font-size: 0.8rem !important;
   }
-  
+
   .app-card .dropdown-item {
     padding: 0.2rem 0.5rem !important;
     font-size: 0.8rem !important;
   }
-  
+
   .app-card .dropdown-item i {
     font-size: 0.8rem !important;
     width: 10px !important;
