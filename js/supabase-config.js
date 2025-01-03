@@ -158,7 +158,7 @@ function initSupabase() {
     },
   };
 
-  return supabase;
+  return {supabase, loadApps};
 }
 
 export { initSupabase };
